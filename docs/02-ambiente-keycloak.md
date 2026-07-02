@@ -12,15 +12,36 @@ Para reduzir problemas de compatibilidade durante o estudo, esta POC usa a mesma
 
 O Angular 20 funciona com o `keycloak-js` usado na POC porque a integração acontece via adapter JavaScript e protocolo OIDC. A escolha de manter `keycloak-js` e Keycloak Server na mesma versão deixa o laboratório mais previsível.
 
-## Subir o Keycloak com Docker
+## Subir o Keycloak com Docker Compose
 
-Execute o container em modo desenvolvimento:
+Na raiz do projeto existe o arquivo:
 
-```powershell
-docker run --name keycloak-security-lab -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:21.1.1 start-dev
+```text
+docker-compose.yml
 ```
 
-Esse comando faz o seguinte:
+Ele define o container do Keycloak usado na POC:
+
+```yaml
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:21.1.1
+    container_name: keycloak-security-lab
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+```
+
+Para subir o Keycloak, execute na raiz do repositório:
+
+```powershell
+docker compose up -d
+```
+
+Essa configuração faz o seguinte:
 
 - cria um container chamado `keycloak-security-lab`;
 - expõe o Keycloak em `http://localhost:8080`;
@@ -29,13 +50,29 @@ Esse comando faz o seguinte:
 - define a senha admin como `admin`;
 - inicia o Keycloak com `start-dev`, adequado para laboratório local.
 
-Se já existir um container com esse nome, remova antes:
+Para acompanhar os logs:
+
+```powershell
+docker compose logs -f keycloak
+```
+
+Para parar o container:
+
+```powershell
+docker compose down
+```
+
+Se já existir um container antigo com esse nome, remova antes:
 
 ```powershell
 docker rm -f keycloak-security-lab
 ```
 
-Depois suba novamente o container com o comando anterior.
+Depois suba novamente com:
+
+```powershell
+docker compose up -d
+```
 
 ## Acessar o console administrativo
 

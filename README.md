@@ -60,6 +60,7 @@ poc-security-lab/
 │   └── 05-spring-resource-server.md
 ├── postman/
 │   └── security-lab.postman_collection.json
+├── docker-compose.yml
 └── README.md
 ```
 
@@ -103,7 +104,7 @@ Siga os documentos nesta ordem:
 Subir o Keycloak usado na POC:
 
 ```powershell
-docker run --name keycloak-security-lab -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:21.1.1 start-dev
+docker compose up -d
 ```
 
 Rodar o Angular:
