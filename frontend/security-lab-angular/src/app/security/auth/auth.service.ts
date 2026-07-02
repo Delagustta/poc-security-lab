@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-import { UserInfo } from './user-info.model';
+import { UserInfo } from '../models/user-info.model';
 
 /**
  * Mantém o estado de autenticação da aplicação usando Signals.
@@ -9,7 +9,7 @@ import { UserInfo } from './user-info.model';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthStateService {
+export class AuthService {
   private readonly authenticatedSignal = signal(false);
   private readonly userInfoSignal = signal<UserInfo | null>(null);
 

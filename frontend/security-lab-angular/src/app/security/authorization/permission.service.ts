@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 
-import { KeycloakAuthService } from './keycloak-auth.service';
+import { KeycloakService } from '../keycloak/keycloak.service';
 
 /**
  * Representa a estrutura da claim realm_access presente no Access Token.
@@ -23,7 +23,7 @@ interface ParsedToken {
   providedIn: 'root',
 })
 export class PermissionService {
-  private readonly keycloakAuth = inject(KeycloakAuthService);
+  private readonly keycloakService = inject(KeycloakService);
 
   /**
    * Verifica se o usuário possui uma role específica no realm.
@@ -62,7 +62,7 @@ export class PermissionService {
    * O token é validado antes do acesso para manter tipagem estrita e evitar any.
    */
   private getParsedToken(): ParsedToken | null {
-    const token = this.keycloakAuth.getParsedToken();
+    const token = this.keycloakService.getParsedToken();
 
     return this.isParsedToken(token) ? token : null;
   }

@@ -8,12 +8,12 @@ import {
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { KeycloakAuthService } from './core/auth/keycloak-auth.service';
+import { KeycloakService } from './security/keycloak/keycloak.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideAppInitializer(() => inject(KeycloakAuthService).initialize()),
+    provideAppInitializer(() => inject(KeycloakService).initialize()),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
   ],

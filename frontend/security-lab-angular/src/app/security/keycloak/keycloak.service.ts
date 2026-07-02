@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import Keycloak, { KeycloakProfile } from 'keycloak-js';
 
-import { AuthStateService } from './auth-state.service';
+import { AuthService } from '../auth/auth.service';
+import { UserInfo } from '../models/user-info.model';
 import { keycloakConfig } from './keycloak.config';
-import { UserInfo } from './user-info.model';
 
 /**
  * Encapsula o adapter oficial keycloak-js.
@@ -12,8 +12,8 @@ import { UserInfo } from './user-info.model';
 @Injectable({
   providedIn: 'root',
 })
-export class KeycloakAuthService {
-  private readonly authState = inject(AuthStateService);
+export class KeycloakService {
+  private readonly authService = inject(AuthService);
   private readonly keycloak = new Keycloak(keycloakConfig);
 
   /**
@@ -33,10 +33,10 @@ export class KeycloakAuthService {
         return;
       }
 
-      this.authState.clearAuthentication();
+      this.authService.clearAuthentication();
     } catch (error: unknown) {
       console.error('Erro ao inicializar o Keycloak.', error);
-      this.authState.clearAuthentication();
+      this.authService.clearAuthentication();
     }
   }
 
@@ -53,7 +53,7 @@ export class KeycloakAuthService {
    * Redireciona o usuário para logout no Keycloak e retorna para a aplicação.
    */
   logout(): Promise<void> {
-    this.authState.clearAuthentication();
+    this.authService.clearAuthentication();
 
     return this.keycloak.logout({
       redirectUri: window.location.origin,
@@ -88,7 +88,7 @@ export class KeycloakAuthService {
   private async loadAuthenticatedUser(): Promise<void> {
     const profile = await this.getAuthenticatedUserProfile();
 
-    this.authState.setAuthenticated(this.mapProfileToUserInfo(profile));
+    this.authService.setAuthenticated(this.mapProfileToUserInfo(profile));
   }
 
   /**

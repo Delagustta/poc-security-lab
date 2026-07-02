@@ -28,8 +28,18 @@ poc-security-lab/
 │       └── src/
 │           └── app/
 │               ├── core/
-│               ├── features/
-│               ├── shared/
+│               │   ├── config/
+│               │   └── services/
+│               ├── security/
+│               │   ├── keycloak/
+│               │   ├── auth/
+│               │   ├── authorization/
+│               │   │   └── directives/
+│               │   └── models/
+│               ├── pages/
+│               │   ├── home/
+│               │   ├── profile/
+│               │   └── debug/
 │               └── app.component.ts
 ├── backend/
 │   └── security-lab-api/
@@ -67,7 +77,7 @@ Spring Boot Resource Server
 
 ### Configuração usada no laboratório
 
-Os nomes abaixo são os usados nesta POC. Eles podem ser trocados, desde que a configuração do Keycloak e o arquivo `frontend/security-lab-angular/src/app/core/auth/keycloak.config.ts` sejam mantidos sincronizados.
+Os nomes abaixo são os usados nesta POC. Eles podem ser trocados, desde que a configuração do Keycloak e o arquivo `frontend/security-lab-angular/src/app/security/keycloak/keycloak.config.ts` sejam mantidos sincronizados.
 
 - Realm: `realm-test-angular`
 - Client: `security-lab-angular`
@@ -75,6 +85,8 @@ Os nomes abaixo são os usados nesta POC. Eles podem ser trocados, desde que a c
 - URL do Keycloak: `http://localhost:8080`
 - URL do Angular em desenvolvimento: `http://localhost:4200`
 - Issuer da API: `http://localhost:8080/realms/realm-test-angular`
+- Realm Roles usadas no Angular: `ADMIN`, `FINANCEIRO`
+- Client Roles usadas na API: `user`, `admin`
 
 ### Trilha de documentação
 

@@ -2,7 +2,7 @@ import { KeycloakConfig } from 'keycloak-js';
 
 /**
  * Configuração centralizada do client Angular no Keycloak.
- * Mantê-la isolada facilita trocar realm, client ou URL sem alterar a UI.
+ * Mantê-la neste pacote deixa claro que a configuração pertence à integração com o provedor OIDC.
  */
 export const keycloakConfig: KeycloakConfig = {
   url: 'http://localhost:8080',

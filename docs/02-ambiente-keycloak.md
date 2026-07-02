@@ -116,6 +116,38 @@ Proof Key for Code Exchange Code Challenge Method: S256
 
 O PKCE é importante para SPAs porque elas são aplicações públicas e não conseguem proteger um client secret.
 
+## Criar Realm Roles
+
+As Realm Roles são usadas pelo frontend para demonstrar autorização baseada na claim:
+
+```text
+realm_access.roles
+```
+
+No realm `realm-test-angular`:
+
+1. Acesse `Realm roles`.
+2. Clique em `Create role`.
+3. Crie a role:
+
+```text
+USER
+```
+
+4. Crie também a role:
+
+```text
+ADMIN
+```
+
+5. Crie também a role:
+
+```text
+FINANCEIRO
+```
+
+Essas roles aparecerão no Access Token dentro de `realm_access.roles` quando forem atribuídas ao usuário.
+
 ## Criar Client Roles
 
 Ainda no client `security-lab-angular`, crie as roles que serão usadas pela API Spring Boot:
@@ -170,23 +202,36 @@ O nome do usuário pode ser outro. O importante é que ele esteja habilitado e t
 
 ## Associar roles ao usuário
 
-Para testar os endpoints protegidos por role:
+Para testar a tela de permissões do Angular e os endpoints protegidos por role:
 
 1. Acesse `Users`.
 2. Abra o usuário `user-angular`.
 3. Acesse `Role mapping`.
 4. Clique em `Assign role`.
-5. Filtre por client roles, se necessário.
-6. Selecione as roles do client `security-lab-angular`:
+5. Selecione as Realm Roles:
+
+```text
+USER
+ADMIN
+FINANCEIRO
+```
+
+6. Filtre por client roles, se necessário.
+7. Selecione também as roles do client `security-lab-angular`:
 
 ```text
 user
 admin
 ```
 
-7. Confirme a associação.
+8. Confirme a associação.
 
 Para testar cenários de acesso negado, remova uma das roles do usuário e gere um novo token.
+
+Diferença importante:
+
+- O frontend lê Realm Roles de `realm_access.roles`.
+- O backend lê Client Roles de `resource_access.security-lab-angular.roles`.
 
 ## Checklist de configuração
 
@@ -202,6 +247,8 @@ Antes de testar o Angular, confirme:
 - `http://localhost:4200/*` está em Valid Post Logout Redirect URIs.
 - `http://localhost:4200` está em Web Origins.
 - O usuário de teste existe, está habilitado e tem senha definida.
+- As Realm Roles `USER`, `ADMIN` e `FINANCEIRO` existem no realm.
+- O usuário de teste possui as Realm Roles necessárias para acessar as rotas protegidas do Angular.
 - As Client Roles `user` e `admin` existem no client `security-lab-angular`.
 - O usuário de teste possui as roles necessárias para acessar `/user` e `/admin`.
 
@@ -210,7 +257,7 @@ Antes de testar o Angular, confirme:
 A configuração do Angular fica em:
 
 ```text
-frontend/security-lab-angular/src/app/core/auth/keycloak.config.ts
+frontend/security-lab-angular/src/app/security/keycloak/keycloak.config.ts
 ```
 
 Ela deve apontar para os mesmos nomes configurados no Keycloak:

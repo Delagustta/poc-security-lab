@@ -8,9 +8,7 @@ O objetivo é comprovar que o Angular consegue autenticar um usuário no Keycloa
 
 Nesta etapa ainda não foram implementados:
 
-- Guards;
 - Interceptors;
-- controle de autorização por roles;
 - exibição de tokens;
 - chamada para backend.
 
@@ -29,7 +27,7 @@ Foi usada a versão exata `21.1.1` para manter compatibilidade direta com o cont
 Arquivo:
 
 ```text
-frontend/security-lab-angular/src/app/core/auth/keycloak.config.ts
+frontend/security-lab-angular/src/app/security/keycloak/keycloak.config.ts
 ```
 
 Configuração usada:
@@ -48,33 +46,43 @@ Os nomes podem ser alterados, mas sempre em conjunto:
 - se mudar o client ID no Keycloak, atualize `clientId`;
 - se mudar a porta ou host do Keycloak, atualize `url`.
 
-## Organização da camada de autenticação
+## Organização da camada de segurança
 
-A autenticação fica em:
+A segurança do frontend fica em:
 
 ```text
-src/app/core/auth/
+src/app/security/
 ```
 
 Arquivos principais:
 
 ```text
-core/auth/
-├── auth-state.service.ts
-├── keycloak-auth.service.ts
-├── keycloak.config.ts
-└── user-info.model.ts
+security/
+├── keycloak/
+│   ├── keycloak.config.ts
+│   └── keycloak.service.ts
+├── auth/
+│   ├── auth.service.ts
+│   └── auth.guard.ts
+├── authorization/
+│   ├── permission.service.ts
+│   ├── role.guard.ts
+│   └── directives/
+│       ├── has-role.directive.ts
+│       └── has-any-role.directive.ts
+└── models/
+    └── user-info.model.ts
 ```
 
 ## Responsabilidade de cada arquivo
 
-### keycloak.config.ts
+### security/keycloak/keycloak.config.ts
 
 Centraliza a configuração do Keycloak.
 
 Esse arquivo evita espalhar URL, realm e client ID pela aplicação.
 
-### user-info.model.ts
+### security/models/user-info.model.ts
 
 Define o modelo usado pela UI para exibir os dados básicos do usuário:
 
@@ -86,7 +94,7 @@ E-mail
 
 Nesta etapa, tokens não são exibidos.
 
-### auth-state.service.ts
+### security/auth/auth.service.ts
 
 Mantém o estado de autenticação usando Signals.
 
@@ -98,7 +106,7 @@ Ele sabe:
 
 Esse serviço não chama o Keycloak diretamente. Ele apenas guarda estado para a UI.
 
-### keycloak-auth.service.ts
+### security/keycloak/keycloak.service.ts
 
 Encapsula o adapter `keycloak-js`.
 
@@ -111,6 +119,38 @@ Ele é responsável por:
 - carregar o perfil do usuário autenticado;
 - converter o perfil do Keycloak para o modelo usado pela aplicação.
 
+### security/authorization/permission.service.ts
+
+Centraliza verificações de autorização no frontend.
+
+Ele lê Realm Roles do Access Token em:
+
+```text
+tokenParsed.realm_access.roles
+```
+
+Métodos disponíveis:
+
+```text
+hasRole(role)
+hasAnyRole(roles)
+hasAllRoles(roles)
+getRoles()
+```
+
+As roles são normalizadas para maiúsculas para facilitar comparação e exibição.
+
+### security/authorization/directives
+
+Diretivas estruturais para exibir conteúdo condicionalmente:
+
+```text
+*appHasRole
+*appHasAnyRole
+```
+
+Elas usam o `PermissionService` e evitam espalhar lógica de role pelos templates.
+
 ## Inicialização no bootstrap do Angular
 
 A inicialização acontece no arquivo:
@@ -119,7 +159,7 @@ A inicialização acontece no arquivo:
 src/app/app.config.ts
 ```
 
-O Angular chama `KeycloakAuthService.initialize()` durante o bootstrap da aplicação.
+O Angular chama `KeycloakService.initialize()` durante o bootstrap da aplicação.
 
 Na inicialização, o adapter é configurado com:
 
@@ -140,7 +180,7 @@ Significado:
 Arquivo:
 
 ```text
-src/app/features/home/home.page.ts
+src/app/pages/home/home.page.ts
 ```
 
 Quando o usuário não está autenticado:
@@ -155,14 +195,83 @@ Quando o usuário está autenticado:
 O botão `Entrar` chama:
 
 ```text
-KeycloakAuthService.login()
+KeycloakService.login()
 ```
 
 O botão `Sair` chama:
 
 ```text
-KeycloakAuthService.logout()
+KeycloakService.logout()
 ```
+
+O botão `Mostrar Roles` navega para:
+
+```text
+/debug
+```
+
+Essa página fica em:
+
+```text
+src/app/pages/debug/permission-debug.component.ts
+```
+
+Ela mostra as Realm Roles presentes no Access Token.
+
+## Rotas protegidas por autenticação e roles
+
+As rotas atuais são:
+
+```text
+/                 Home
+/dashboard        Dashboard
+/financeiro       Financeiro
+/administracao    Administração
+/perfil           Perfil
+/debug            Debug de permissões
+```
+
+Proteções aplicadas:
+
+```text
+/dashboard      exige autenticação
+/perfil         exige autenticação
+/financeiro     exige Realm Role FINANCEIRO
+/administracao  exige Realm Role ADMIN
+```
+
+O `RoleGuard` lê a role necessária em `route.data.role`.
+
+Exemplo:
+
+```text
+data: { role: 'ADMIN' }
+```
+
+Na Home, o menu usa o `PermissionService` diretamente para exibir ou esconder os links `Financeiro` e `Administração`. Nenhuma diretiva customizada é usada nesse menu.
+
+## Menu, roles e token atualizado
+
+O menu da Home é uma conveniência visual. Ele usa as roles presentes no Access Token atual para decidir se mostra links como `Financeiro` e `Administração`.
+
+Isso significa que, se uma role for removida diretamente no Keycloak enquanto o usuário ainda está logado, o menu pode continuar exibindo o link até que o Angular receba um token novo ou o usuário faça logout/login.
+
+Mesmo nesse cenário, a rota continua protegida pelo `RoleGuard`.
+
+Exemplo:
+
+```text
+1. Usuário faz login com a role FINANCEIRO.
+2. A Home mostra o link Financeiro.
+3. A role FINANCEIRO é removida no Keycloak.
+4. O menu pode continuar mostrando o link por estar usando o token atual.
+5. Ao tentar acessar /financeiro, o RoleGuard reavalia a permissão.
+6. Sem a role necessária, o usuário é redirecionado para a Home.
+```
+
+Esse comportamento reforça uma regra importante: esconder links melhora a experiência, mas não é a segurança principal. A proteção real fica nos guards do frontend e, principalmente, nas validações do backend.
+
+Nesta POC ainda não existe refresh explícito de token durante troca de rota. Em uma evolução futura, a aplicação pode chamar `updateToken` antes de avaliar permissões ou criar uma tela de acesso negado.
 
 ## Por que usar Signals
 

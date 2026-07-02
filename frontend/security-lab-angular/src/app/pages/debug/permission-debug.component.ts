@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { AuthStateService } from '../../core/auth/auth-state.service';
-import { PermissionService } from '../../core/auth/permission.service';
+import { AuthService } from '../../security/auth/auth.service';
+import { PermissionService } from '../../security/authorization/permission.service';
 
 /**
  * Página temporária para visualizar as Realm Roles extraídas do Access Token.
@@ -43,17 +43,17 @@ import { PermissionService } from '../../core/auth/permission.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PermissionDebugComponent {
-  private readonly authState = inject(AuthStateService);
+  private readonly authService = inject(AuthService);
   private readonly permissionService = inject(PermissionService);
 
-  protected readonly username = computed(() => this.authState.userInfo()?.username ?? '-');
+  protected readonly username = computed(() => this.authService.userInfo()?.username ?? '-');
 
   /**
    * Lê as Realm Roles do Access Token via PermissionService.
    * O serviço usa tokenParsed.realm_access.roles, que é a claim padrão de roles de realm.
    */
   protected readonly roles = computed(() => {
-    this.authState.userInfo();
+    this.authService.userInfo();
 
     return this.permissionService.getRoles();
   });
