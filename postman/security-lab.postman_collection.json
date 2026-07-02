@@ -1,0 +1,155 @@
+{
+  "info": {
+    "_postman_id": "7ffde145-d8c9-47e9-b2d6-7c4f4d9f4d8d",
+    "name": "POC Security Lab",
+    "description": "Collection para testar os endpoints da POC com Angular, Keycloak e Spring Boot Resource Server.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "API - Public",
+      "item": [
+        {
+          "name": "GET /public",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/public",
+              "host": [
+                "{{apiBaseUrl}}"
+              ],
+              "path": [
+                "public"
+              ]
+            },
+            "description": "Endpoint público. Não exige token."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API - Protected",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{accessToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "GET /authenticated",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/authenticated",
+              "host": [
+                "{{apiBaseUrl}}"
+              ],
+              "path": [
+                "authenticated"
+              ]
+            },
+            "description": "Endpoint protegido. Exige apenas JWT válido emitido pelo Keycloak."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /user",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/user",
+              "host": [
+                "{{apiBaseUrl}}"
+              ],
+              "path": [
+                "user"
+              ]
+            },
+            "description": "Endpoint protegido por autenticação e role USER. O token deve conter a Client Role user no client security-lab-angular."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /admin",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiBaseUrl}}/admin",
+              "host": [
+                "{{apiBaseUrl}}"
+              ],
+              "path": [
+                "admin"
+              ]
+            },
+            "description": "Endpoint protegido por autenticação e role ADMIN. O token deve conter a Client Role admin no client security-lab-angular."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Keycloak - Metadata",
+      "item": [
+        {
+          "name": "GET OpenID Configuration",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{keycloakUrl}}/realms/{{realm}}/.well-known/openid-configuration",
+              "host": [
+                "{{keycloakUrl}}"
+              ],
+              "path": [
+                "realms",
+                "{{realm}}",
+                ".well-known",
+                "openid-configuration"
+              ]
+            },
+            "description": "Metadata OIDC do realm. Ajuda a validar se o Keycloak e o issuer estão acessíveis."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "apiBaseUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "keycloakUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "realm",
+      "value": "realm-test-angular",
+      "type": "string"
+    },
+    {
+      "key": "clientId",
+      "value": "security-lab-angular",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
