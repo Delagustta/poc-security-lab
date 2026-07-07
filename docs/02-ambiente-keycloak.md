@@ -270,6 +270,65 @@ Diferença importante:
 - O frontend lê Realm Roles de `realm_access.roles`.
 - O backend lê Client Roles de `resource_access.security-lab-angular.roles`.
 
+## Testar roles por grupo
+
+Outra forma de testar a POC é associar roles a um grupo em vez de associá-las diretamente ao usuário.
+
+Esse cenário é útil porque se aproxima mais de um uso real: o usuário entra em um grupo e herda as permissões daquele grupo.
+
+Exemplo:
+
+1. Acesse `Groups`.
+2. Crie um grupo, por exemplo:
+
+```text
+grupo-financeiro
+```
+
+3. Abra o grupo criado.
+4. Acesse `Role mapping`.
+5. Associe as Realm Roles:
+
+```text
+FINANCEIRO
+USER
+```
+
+6. Acesse `Users`.
+7. Abra o usuário de teste.
+8. Remova, se desejar, as roles associadas diretamente ao usuário.
+9. Acesse a aba `Groups`.
+10. Associe o usuário ao grupo `grupo-financeiro`.
+11. Faça logout/login novamente na aplicação Angular.
+
+Após o novo login, o Access Token deve continuar contendo as roles herdadas do grupo em:
+
+```text
+realm_access.roles
+```
+
+Com isso, a rota `/financeiro` continua funcionando normalmente porque o `RoleGuard` lê as roles finais presentes no token, independentemente de elas terem vindo diretamente do usuário ou herdadas por grupo.
+
+## Exibir grupos no token
+
+Para visualizar também o grupo dentro do token, configure o mapper de group membership.
+
+No Keycloak:
+
+1. Acesse `Client scopes`.
+2. Abra o client scope `roles`.
+3. Acesse `Mappers`.
+4. Adicione ou configure um mapper do tipo:
+
+```text
+Group Membership
+```
+
+5. Configure para incluir a informação no token.
+6. Faça logout/login novamente para gerar um novo token.
+
+Depois disso, além das roles em `realm_access.roles`, o token também passa a mostrar a informação de grupos. Isso é útil para depuração e para entender de onde as permissões podem estar vindo.
+
 ## Checklist de configuração
 
 Antes de testar o Angular, confirme:
