@@ -1,0 +1,225 @@
+{
+  "info": {
+    "_postman_id": "7ffde145-d8c9-47e9-b2d6-7c4f4d9f4d8d",
+    "name": "Security Lab Admin",
+    "description": "Security Lab V1 - Keycloak Admin API, Backend e WSO2.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 - Keycloak",
+      "item": [
+        {
+          "name": "Authentication",
+          "item": [
+            {
+              "name": "01 - Get Admin Token (Password Grant)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const r=pm.response.json();",
+                      "pm.environment.set('adminAccessToken',r.access_token);",
+                      "pm.environment.set('refreshToken',r.refresh_token);",
+                      "pm.environment.set('expiresIn',r.expires_in);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "grant_type",
+                      "value": "password"
+                    },
+                    {
+                      "key": "client_id",
+                      "value": "admin-cli"
+                    },
+                    {
+                      "key": "username",
+                      "value": "{{adminUser}}"
+                    },
+                    {
+                      "key": "password",
+                      "value": "{{adminPassword}}"
+                    }
+                  ]
+                },
+                "url": "{{keycloakUrl}}/realms/master/protocol/openid-connect/token"
+              }
+            },
+            {
+              "name": "02 - Get Admin Token (Client Credentials)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "grant_type",
+                      "value": "client_credentials"
+                    },
+                    {
+                      "key": "client_id",
+                      "value": "{{adminClientId}}"
+                    },
+                    {
+                      "key": "client_secret",
+                      "value": "{{clientSecret}}"
+                    }
+                  ]
+                },
+                "url": "{{keycloakUrl}}/realms/master/protocol/openid-connect/token"
+              }
+            },
+            {
+              "name": "03 - Refresh Token",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "grant_type",
+                      "value": "refresh_token"
+                    },
+                    {
+                      "key": "client_id",
+                      "value": "admin-cli"
+                    },
+                    {
+                      "key": "refresh_token",
+                      "value": "{{refreshToken}}"
+                    }
+                  ]
+                },
+                "url": "{{keycloakUrl}}/realms/master/protocol/openid-connect/token"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Metadata",
+          "item": [
+            {
+              "name": "GET OpenID Configuration",
+              "request": {
+                "method": "GET",
+                "url": "{{keycloakUrl}}/realms/{{realm}}/.well-known/openid-configuration"
+              }
+            },
+            {
+              "name": "GET JWKS",
+              "request": {
+                "method": "GET",
+                "url": "{{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/certs"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin API",
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{adminAccessToken}}",
+                "type": "string"
+              }
+            ]
+          },
+          "item": [
+            {
+              "name": "Users",
+              "item": []
+            },
+            {
+              "name": "Groups",
+              "item": []
+            },
+            {
+              "name": "Realm Roles",
+              "item": []
+            },
+            {
+              "name": "Client Roles",
+              "item": []
+            },
+            {
+              "name": "Clients",
+              "item": []
+            },
+            {
+              "name": "Sessions",
+              "item": []
+            },
+            {
+              "name": "Events",
+              "item": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Backend API",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{accessToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": []
+    },
+    {
+      "name": "03 - WSO2",
+      "item": [
+        {
+          "name": "Gateway",
+          "item": []
+        },
+        {
+          "name": "Protected APIs",
+          "item": []
+        }
+      ]
+    }
+  ]
+}

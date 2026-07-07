@@ -165,6 +165,7 @@ Admin endpoint
 Primeiro, o Keycloak precisa estar rodando:
 
 ```powershell
+cd keycloak
 docker compose up -d
 ```
 
@@ -247,28 +248,39 @@ Observação: esse procedimento é apenas para facilitar o teste manual da POC. 
 A collection da POC fica em:
 
 ```text
-postman/security-lab.postman_collection.json
+postman/collections/security-lab-admin.postman_collection.json
 ```
 
-Ela contém:
+Ela está organizada para acompanhar a arquitetura futura da POC:
 
-- `GET /public`;
-- `GET /authenticated`;
-- `GET /user`;
-- `GET /admin`;
-- endpoint de metadata OIDC do Keycloak.
+```text
+01 - Keycloak
+02 - Backend API
+03 - WSO2
+```
 
-Variáveis incluídas:
+Nesta versão, a collection já possui requests de autenticação administrativa do Keycloak e metadata OIDC. A pasta `02 - Backend API` fica reservada para os requests da API conforme a POC evoluir.
+
+O environment local fica em:
+
+```text
+postman/environments/local.postman_environment.json
+```
+
+Variáveis incluídas no environment:
 
 ```text
 apiBaseUrl: http://localhost:8081
+gatewayBaseUrl: http://localhost:8280
 keycloakUrl: http://localhost:8080
 realm: realm-test-angular
 clientId: security-lab-angular
+adminClientId: security-lab-admin
 accessToken: vazio inicialmente
+adminAccessToken: vazio inicialmente
 ```
 
-Para testar os endpoints protegidos, preencha a variável `accessToken` com um access token válido emitido pelo Keycloak. Os requests protegidos usam `Authorization: Bearer {{accessToken}}`.
+Para testar os endpoints protegidos manualmente, preencha a variável `accessToken` com um access token válido emitido pelo Keycloak e envie `Authorization: Bearer {{accessToken}}`.
 
 ## O que o Spring valida no JWT
 

@@ -17,7 +17,7 @@ O Angular 20 funciona com o `keycloak-js` usado na POC porque a integração aco
 Na raiz do projeto existe o arquivo:
 
 ```text
-docker-compose.yml
+keycloak/docker-compose.yml
 ```
 
 Ele define o container do Keycloak usado na POC:
@@ -35,9 +35,10 @@ services:
       - "8080:8080"
 ```
 
-Para subir o Keycloak, execute na raiz do repositório:
+Para subir o Keycloak, execute:
 
 ```powershell
+cd keycloak
 docker compose up -d
 ```
 
@@ -71,6 +72,7 @@ docker rm -f keycloak-security-lab
 Depois suba novamente com:
 
 ```powershell
+cd keycloak
 docker compose up -d
 ```
 

@@ -59,8 +59,13 @@ poc-security-lab/
 │   ├── 04-fluxo-authorization-code-pkce.md
 │   └── 05-spring-resource-server.md
 ├── postman/
-│   └── security-lab.postman_collection.json
-├── docker-compose.yml
+│   ├── collections/
+│   │   └── security-lab-admin.postman_collection.json
+│   ├── environments/
+│   │   └── local.postman_environment.json
+│   └── README.md
+├── keycloak/
+│   └── docker-compose.yml
 └── README.md
 ```
 
@@ -104,6 +109,7 @@ Siga os documentos nesta ordem:
 Subir o Keycloak usado na POC:
 
 ```powershell
+cd keycloak
 docker compose up -d
 ```
 
@@ -127,5 +133,11 @@ mvn spring-boot:run
 Collection Postman:
 
 ```text
-postman/security-lab.postman_collection.json
+postman/collections/security-lab-admin.postman_collection.json
+```
+
+Environment local:
+
+```text
+postman/environments/local.postman_environment.json
 ```
